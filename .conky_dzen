@@ -1,0 +1,10 @@
+background yes
+out_to_console yes
+out_to_x no
+# Update interval in seconds
+update_interval 1
+pad_percents 2
+use_spacer left
+
+TEXT
+^fg(\#ff8700) ^i(/home/bnicholas/.xmonad/dzen2/mpd.xbm) ${exec ~/bin/conky-mpd-format.rb}^fg(\#ff8700) ^i(/home/bnicholas/.xmonad/dzen2/cpu.xbm) ^fg(\#5fffff)${cpu cpu1}% ${cpu cpu2}% ^fg(\#ff8700)^i(/home/bnicholas/.xmonad/dzen2/mem.xbm) ^fg(\#5FFFFF)${memperc}% ^fg(\#ff8700) ^i(/home/bnicholas/.xmonad/dzen2/005b_66.xbm) ^fg(\#5fffff)${exec amixer get Master | egrep -o "[0-9]+%" | head -1 | egrep -o "[0-9]*"}% ^fg(\#ff8700) ^i(/home/bnicholas/.xmonad/dzen2/005b_36.xbm) ^fg(\#5FFFFF) ${time %d %m %Y} ^fg(\#d6ff5f) ${time %I:%M %p}
