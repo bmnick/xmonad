@@ -16,9 +16,11 @@ import XMonad.Util.EZConfig
 import System.IO
 
 myBitmapsDir = "/home/bnicholas/.xmonad/dzen2"
-myLayout = avoidStruts (tall ||| Mirror tall ||| Full ||| Circle)
+
+myLayout = avoidStruts (tall ||| Mirror tall ||| Full)
     where
         tall = Tall 1 (3/100) (1/2)
+
 myLogHook :: Handle -> X ()
 myLogHook h = dynamicLogWithPP $ defaultPP
     { ppCurrent           =   dzenColor "#000000" "#ffaf00" . pad
@@ -33,7 +35,6 @@ myLogHook h = dynamicLogWithPP $ defaultPP
                                   "Tall"             ->      "^i(" ++ myBitmapsDir ++ "/tall.xbm)"
                                   "Mirror Tall"      ->      "^i(" ++ myBitmapsDir ++ "/mtall.xbm)"
                                   "Full"             ->      "^i(" ++ myBitmapsDir ++ "/full.xbm)"
-                                  "Circle"           ->      "O"
                                   _                  ->      x
                               )
     , ppTitle             =   (" " ++) . dzenColor "#cccccc" "#1B1D1E" . dzenEscape
@@ -42,6 +43,7 @@ myLogHook h = dynamicLogWithPP $ defaultPP
 
 myXmonadBar = "dzen2 -x '0' -y '0' -h '24' -w '1000' -ta 'l' -fg '#FFFFFF' -bg '#1B1D1E'"
 myStatusBar = "conky -c /home/bnicholas/.xmonad/.conky_dzen | dzen2 -x '1000' -w '920' -h '24' -ta 'r' -bg '#1B1D1E' -fg '#FFFFFF' -y '0'"
+myLocker = "xautolock -time 10 -locker 'gnome-screensaver-command -l' -notify 10 -notifier \"echo 'Locking in 10 seconds' | dzen2 -x 0 -y 24 -w 1920 -bg '#641d1e' -fg '#cccccc' -e 'onstart=uncollapse' -p 10 -h 24\""
 
 myWorkspaces :: [String]
 myWorkspaces = clickable . (map dzenEscape) $ ["1:web", "2:vim", "3:mail", "4:chat", "5:music", "6:db", "7:vm", "8:/", "9:/"]
@@ -59,11 +61,11 @@ myWorkspaces = clickable . (map dzenEscape) $ ["1:web", "2:vim", "3:mail", "4:ch
                     "9:/"     -> "^i(/home/bnicholas/.xmonad/dzen2/005b_24.xbm)"
                     _         -> ws
                   )
--- ["1 ^i(/home/bnicholas/.xmonad/dzen2/005b_03.xpm)", "2 ", "3 ", "4 ", "5 ", "6 ", "7 ", "8 ", "9 "]
 
 main = do
     dzenLeftBar <- spawnPipe myXmonadBar
     dzenRightBar <- spawnPipe myStatusBar
+    locker <- spawn myLocker
     xmonad $ withUrgencyHook NoUrgencyHook $defaultConfig
         { modMask = mod4Mask
         , manageHook = manageDocks <+> manageHook defaultConfig
@@ -89,6 +91,9 @@ main = do
         , ("<XF86AudioStop>", spawn "mpc stop")
         , ("<XF86AudioPrev>", spawn "mpc prev")
         , ("<XF86AudioNext>", spawn "mpc next")
+        , ("<XF86AudioLowerVolume>", spawn "~/.xmonad/dvol -d 4")
+        , ("<XF86AudioRaiseVolume>", spawn "~/.xmonad/dvol -i 4")
+        , ("<XF86AudioMute>", spawn "~/.xmonad/dvol -d 100")
         , ("M-[", prevWS)
         , ("M-]", nextWS)
         ]
