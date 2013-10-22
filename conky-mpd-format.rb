@@ -13,7 +13,7 @@ else
     "^i(/home/bnicholas/.xmonad/dzen2/005b_58.xbm)"
 end
 
-out = "^fg(\#d7ff5f)"
+out = "^ca(1,mpc toggle)^ca(4, mpc next)^ca(5, mpc prev)^fg(\#d7ff5f)"
 out << stat_image
 out << " ^fg(\#5fffff)"
 if lines.count > 1
@@ -21,6 +21,7 @@ if lines.count > 1
 else
     out << "---"
 end
+out << "^ca()^ca()^ca()"
 
 print out
 
