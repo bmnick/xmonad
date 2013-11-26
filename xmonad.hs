@@ -25,42 +25,44 @@ myLayout = avoidStruts (tall ||| Mirror tall ||| Full)
 
 myLogHook :: Handle -> X ()
 myLogHook h = dynamicLogWithPP $ defaultPP
-    { ppCurrent           =   dzenColor "#000000" "#ffaf00" . pad
-    , ppVisible           =   dzenColor "#00005f" "#d7ff5f" . pad
-    , ppHidden            =   dzenColor "#cccccc" "#1B1D1E" . pad
-    , ppHiddenNoWindows   =   dzenColor "#7b7b7b" "#1B1D1E" . pad
-    , ppUrgent            =   dzenColor "#ffffff" "#6f1D1E" . pad
+    { ppCurrent           =   dzenColor "#073642" "#cb4b16" . pad
+    , ppVisible           =   dzenColor "#073642" "#b58900" . pad
+    , ppHidden            =   dzenColor "#93a1a1" "#002b36" . pad
+    , ppHiddenNoWindows   =   dzenColor "#586e75" "#002b36" . pad
+    , ppUrgent            =   dzenColor "#073642" "#d33682" . pad
     , ppWsSep             =   ""
     , ppSep               =   "|"
-    , ppLayout            =   dzenColor "#ffaf00" "#1B1D1E" .
+    , ppLayout            =   dzenColor "#cb4b16" "#002b36" .
                               (\x -> case x of
                                   "Tall"             ->      "^i(" ++ myBitmapsDir ++ "/tall.xbm)"
                                   "Mirror Tall"      ->      "^i(" ++ myBitmapsDir ++ "/mtall.xbm)"
                                   "Full"             ->      "^i(" ++ myBitmapsDir ++ "/full.xbm)"
                                   _                  ->      x
                               )
-    , ppTitle             =   (" " ++) . dzenColor "#cccccc" "#1B1D1E" . dzenEscape
+    , ppTitle             =   (" " ++) . dzenColor "#93a1a1" "#002b36" . dzenEscape
     , ppOutput            =   hPutStrLn h
     }
 
 myXPConfig :: XPConfig
 myXPConfig =
-    defaultXPConfig { font                  = "xft:Meslo LG S DZ for Powerline:normal:pixelsize=15:antialias=true:hinting=true"
-                    , bgColor               = "#1b1d1e"
-                    , fgColor               = "#cccccc"
-                    , bgHLight              = "#d7ff5f"
-                    , fgHLight              = "#00005f"
-                    , borderColor           = "#3b3d3e"
+    defaultXPConfig { font                  = "xft:Meslo LG S DZ for Powerline:Regular:pixelsize=12:antialias=true:hinting=true"
+                    , bgColor               = "#073642"
+                    , fgColor               = "#93a1a1"
+                    , bgHLight              = "#b48900"
+                    , fgHLight              = "#073642"
+                    , borderColor           = "#002b36"
                     , promptBorderWidth     = 0
                     , height                = 24
                     , historyFilter         = deleteConsecutive
                     , position              = Top
                     }
 
-myXmonadBar = "dzen2 -x '0' -y '0' -h '24' -w '1000' -ta 'l' -fg '#FFFFFF' -bg '#1B1D1E' -fn 'Meslo LG S DZ for Powerline:normal:pixelsize=15:antialias=true:hinting=true'"
-myStatusBar = "conky -c /home/bnicholas/.xmonad/.conky_dzen | dzen2 -x '1000' -w '920' -h '24' -ta 'r' -bg '#1B1D1E' -fg '#FFFFFF' -y '0' -fn 'Meslo LG S DZ for Powerline:medium:pixelsize=15:antialias=true:hinting=true'"
-myLocker = "xautolock -time 10 -locker 'gnome-screensaver-command -l' -notify 10 -notifier \"echo 'Locking in 10 seconds' | dzen2 -x 0 -y 24 -w 1920 -bg '#641d1e' -fg '#cccccc' -e 'onstart=uncollapse' -p 10 -h 24\""
+myXmonadBar = "dzen2 -x '0' -y '0' -h '24' -w '1000' -ta 'l' -fg '#93a1a1' -bg '#002b36' -fn 'Segoe UI:Mono Regular:pixelsize=14:antialias=true:hinting=true'"
+myStatusBar = "conky -c /home/bnicholas/.xmonad/.conky_dzen | dzen2 -x '1000' -w '920' -h '24' -ta 'r' -bg '#002b36' -fg '#93a1a1' -y '0' -fn 'Segoe UI:Mono Regular:pixelsize=14:antialias=true:hinting=true'"
+myLocker = "xautolock -time 10 -locker 'gnome-screensaver-command -l' -notify 10 -notifier \"echo 'Locking in 10 seconds' | dzen2 -x 0 -y 24 -w 1920 -bg '#d33682' -fg '#073642' -e 'onstart=uncollapse' -p 10 -h 24\""
 myCompositor = "xcompmgr -c"
+myWallpaper = "nitrogen --restore"
+myMail = "davmail"
 
 myWorkspaces :: [String]
 myWorkspaces = clickable . (map dzenEscape) $ ["1:web", "2:vim", "3:mail", "4:chat", "5:music", "6:db", "7:vm", "8:/", "9:/"]
@@ -84,14 +86,14 @@ main = do
     dzenRightBar <- spawnPipe myStatusBar
     locker <- spawn myLocker
     compositing <- spawn myCompositor
+    wallpapers <- spawn myWallpaper
+    mail <- spawn myMail
     xmonad $ withUrgencyHook NoUrgencyHook $defaultConfig
         { modMask = mod4Mask
         , manageHook = manageDocks <+> manageHook defaultConfig
         , layoutHook = myLayout
         , logHook = myLogHook dzenLeftBar >> fadeInactiveLogHook 0xbbbbbbbb
         , terminal = "urxvt"
-        , focusedBorderColor = "#444444"
-        , normalBorderColor = "#1B1D1E"
         , borderWidth = 0
         , workspaces = myWorkspaces
         } `additionalKeys`
@@ -113,7 +115,7 @@ main = do
         , ("M-g", goToSelected defaultGSConfig)
         , ("M-S-d", windowPromptGoto myXPConfig)
 -- Run prompts
-        , ("M-p", shellPrompt myXPConfig)
+        , ("M-S-r", shellPrompt myXPConfig)
         , ("M-r", runOrRaisePrompt myXPConfig)
         , ("M-S-k", sshPrompt myXPConfig)
         , ("M-d", appendFilePrompt myXPConfig "~/todo.txt")
